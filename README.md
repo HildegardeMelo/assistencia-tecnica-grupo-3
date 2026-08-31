@@ -8,11 +8,11 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
 
 ## 👥 Integrantes do Grupo
 
-| **Aluno Anna Maria Cuano Schmidt| 12824129737
-| **Aluno Kelly Bulhoes de Paula | 12824213868
-| **Aluno Hildegarde Nascimento de Melo | 12824144646
-| **Aluno Derik do Nascimento Silva | 12824125448
-| **Aluno Osorio Jacome Xavier de Mesquita Neto  | 12824211707
+ Anna Maria Cuano Schmidt| 12824129737
+ Kelly Bulhoes de Paula | 12824213868
+ Hildegarde Nascimento de Melo | 12824144646
+ Derik do Nascimento Silva | 12824125448
+ Osorio Jacome Xavier de Mesquita Neto  | 12824211707
 
 🎯 Funcionalidades Principais 
 
