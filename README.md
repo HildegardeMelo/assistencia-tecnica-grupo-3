@@ -14,7 +14,7 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
  Derik do Nascimento Silva | 12824125448
  Osorio Jacome Xavier de Mesquita Neto  | 12824211707
 
-🎯 Funcionalidades Principais 
+ ## 🎯 Funcionalidades Principais 
 
  - Triagem Inicial & Contato Agilizado: Envio de links de cadastro direto via WhatsApp para agilizar o atendimento presencial ou remoto. 
  - Cadastro Expresso para Serviços Rápidos: Fluxo simplificado para reparos rápidos (como troca de tela em 1h), coletando apenas os dados necessários para NF. 
@@ -24,7 +24,7 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
  - Checkout & Vitrine de Acessórios: Pagamento via link ou balcão, emissão de NF e sugestão de acessórios compatíveis com o modelo do cliente. 
  - Controle do Prazo Legal de Garantia: Consulta online garantida por 90 dias e arquivamento automático da OS após o 91º dia.
 
-🛠️ Tecnologias Utlizadas
+## 🛠️ Tecnologias Utlizadas
 Frontend:  HTML5 / CSS 
 Backend:  Node.js 
 Banco de Dados:  SQL 
