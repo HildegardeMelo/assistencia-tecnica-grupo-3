@@ -8,11 +8,11 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
 
 ## 👥 Integrantes do Grupo
 
- Anna Maria Cuano Schmidt| 12824129737
- Kelly Bulhoes de Paula | 12824213868
- Hildegarde Nascimento de Melo | 12824144646
- Derik do Nascimento Silva | 12824125448
- Osorio Jacome Xavier de Mesquita Neto  | 12824211707
+- Anna Maria Cuano Schmidt| 12824129737
+- Kelly Bulhoes de Paula | 12824213868
+- Hildegarde Nascimento de Melo | 12824144646
+- Derik do Nascimento Silva | 12824125448
+- Osorio Jacome Xavier de Mesquita Neto  | 12824211707
 
  ## 🎯 Funcionalidades Principais 
 
@@ -25,6 +25,6 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
  - Controle do Prazo Legal de Garantia: Consulta online garantida por 90 dias e arquivamento automático da OS após o 91º dia.
 
 ## 🛠️ Tecnologias Utlizadas
-Frontend:  HTML5 / CSS 
-Backend:  Node.js 
-Banco de Dados:  SQL 
+- Frontend:  HTML5 / CSS 
+- Backend:  Node.js 
+- Banco de Dados:  SQL 
