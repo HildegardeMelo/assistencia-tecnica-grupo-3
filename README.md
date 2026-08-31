@@ -1,4 +1,4 @@
-# 🛠️ Sistema de Gestão de Assistência Técnica 
+# 🛠️ TechFlix OS
 
 https://assistencia-tecnica-grupo-3.vercel.app/
 
