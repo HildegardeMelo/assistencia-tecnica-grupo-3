@@ -4,15 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFix OS - Assistência Técnica Especializada</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Biblioteca para gerar PDF/Imagem da Nota Fiscal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-amber: #F59E0B;
+            --secondary-slate: #0F172A;
+            --bg-base: #F3F4F6;
+            --card-white: #FFFFFF;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Controle de Abas */
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active { 
+            display: block; 
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilo do Cupom Fiscal para a Etapa 6 */
+        .cupom-fiscal {
+            background-color: #fff;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            border: 1px dashed #ccc;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .linha-tracejada {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="text-gray-800">
 
+    <!-- HEADER / NAVEGAÇÃO -->
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -21,7 +68,7 @@
             </div>
             
             <nav class="flex flex-wrap gap-2 text-sm font-medium">
-                <button onclick="switchTab('triagem')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition active-btn" id="btn-triagem">
+                <button onclick="switchTab('triagem')" class="nav-btn bg-amber-500 text-slate-900 px-3 py-2 rounded-lg transition active-btn" id="btn-triagem">
                     <i class="fa-solid fa-comments mr-1"></i> 1. Triagem
                 </button>
                 <button onclick="switchTab('entrada')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-entrada">
@@ -34,7 +81,7 @@
                     <i class="fa-solid fa-list-check mr-1"></i> 5. Status Reparo
                 </button>
                 <button onclick="switchTab('checkout')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-checkout">
-                    <i class="fa-solid fa-cash-register mr-1"></i> 6. Checkout & Loja
+                    <i class="fa-solid fa-cash-register mr-1"></i> 6. Checkout & NF
                 </button>
                 <button onclick="switchTab('garantia')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-garantia">
                     <i class="fa-solid fa-shield-halved mr-1"></i> 7. Garantia 90D
@@ -45,25 +92,22 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8">
 
+        <!-- ETAPA 1: TRIAGEM -->
         <section id="triagem" class="tab-content active bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 1</span>
-                <h2 class="text-2xl font-bold mt-2">Triagem & Pré-Atendimento</h2>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Triagem & Pré-Atendimento</h2>
                 <p class="text-gray-600">Contato inicial via WhatsApp ou balcão para direcionamento ao sistema.</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 <div class="space-y-4">
                     <h3 class="text-lg font-semibold text-slate-800"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i>Inicie seu atendimento online</h3>
-                    <p class="text-gray-600 text-sm">
-                        Economize tempo no balcão! Faça uma pré-avaliação rápida do seu notebook ou smartphone antes mesmo de trazer o aparelho até nossa loja.
-                    </p>
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                        <label class="block text-sm font-medium">Informe seu Nome/Celular:</label>
-                        <input type="text" placeholder="Ex: João Silva" class="w-full p-2 border rounded-md text-sm">
-                        <input type="tel" placeholder="(00) 00000-0000" class="w-full p-2 border rounded-md text-sm">
-                        <button onclick="alert('Redirecionando para o WhatsApp da Assistência...')" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-md transition flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento no WhatsApp
+                        <input type="text" placeholder="Nome Completo" class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                        <input type="tel" placeholder="(00) 00000-0000" class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                        <button onclick="alert('Redirecionando para WhatsApp...')" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-md transition flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento
                         </button>
                     </div>
                 </div>
@@ -71,348 +115,294 @@
                 <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-semibold text-amber-400"><i class="fa-solid fa-store mr-2"></i>Atendimento Presencial</h3>
                     <ul class="space-y-2 text-sm text-gray-300">
-                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Aparelho avaliado na hora pelo técnico.</li>
-                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Identificação do tipo de serviço (Rápido vs. Análise Completa).</li>
-                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Direcionamento imediato para abertura da Ordem de Serviço.</li>
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Avaliação imediata no balcão.</li>
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Abertura ágil de OS.</li>
                     </ul>
-                    <button onclick="switchTab('entrada')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2.5 rounded-md transition">
+                    <button onclick="switchTab('entrada')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2.5 rounded-md transition mt-4">
                         Avançar para Abertura de OS <i class="fa-solid fa-arrow-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </section>
 
+        <!-- ETAPA 2 & 3: ENTRADA E CHECKLIST -->
         <section id="entrada" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 2 e 3</span>
-                <h2 class="text-2xl font-bold mt-2">Recepção do Aparelho & Abertura de OS</h2>
-                <p class="text-gray-600">Escolha a modalidade de reparo e registre o estado de entrada do dispositivo.</p>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Recepção do Aparelho</h2>
             </div>
 
             <div class="grid md:grid-cols-2 gap-4 mb-8">
-                <div id="card-express" onclick="selectRepairType('express')" class="cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl hover:shadow-md transition">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-lg text-slate-900"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Reparo Rápido (Express - 1h)</h3>
-                        <input type="radio" name="tipo_reparo" id="radio-express" checked>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-2">Para trocas simples (ex: tela/bateria). Requer apenas cadastro rápido para Nota Fiscal.</p>
+                <div id="card-express" onclick="selectRepairType('express')" class="cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl transition">
+                    <div class="flex justify-between items-center"><h3 class="font-bold text-slate-900"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Reparo Rápido (1h)</h3><input type="radio" name="tipo_reparo" id="radio-express" checked></div>
+                    <p class="text-sm text-gray-600 mt-2">Cadastro rápido para emissão de NF e reparo imediato.</p>
                 </div>
-
-                <div id="card-longo" onclick="selectRepairType('longo')" class="cursor-pointer border-2 border-gray-200 p-5 rounded-xl hover:shadow-md transition">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-lg text-slate-900"><i class="fa-solid fa-microchip text-slate-700 mr-2"></i>Análise Completa / Importação</h3>
-                        <input type="radio" name="tipo_reparo" id="radio-longo">
-                    </div>
-                    <p class="text-sm text-gray-600 mt-2">Aparelho fica na loja para diagnóstico, orçamento, importação de peças ou reparo avançado.</p>
+                <div id="card-longo" onclick="selectRepairType('longo')" class="cursor-pointer border-2 border-gray-200 p-5 rounded-xl transition">
+                    <div class="flex justify-between items-center"><h3 class="font-bold text-slate-900"><i class="fa-solid fa-microchip text-slate-700 mr-2"></i>Análise Completa</h3><input type="radio" name="tipo_reparo" id="radio-longo"></div>
+                    <p class="text-sm text-gray-600 mt-2">Diagnóstico avançado, orçamentos longos e importações.</p>
                 </div>
             </div>
 
-            <form onsubmit="event.preventDefault(); alert('OS Criada e Comprovante de Entrada Gerado com Sucesso!'); switchTab('orcamento');" class="space-y-6">
+            <form onsubmit="event.preventDefault(); alert('OS Criada com Sucesso!'); switchTab('orcamento');" class="space-y-6">
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h4 class="font-semibold text-slate-800 mb-3"><i class="fa-solid fa-user-gear mr-2"></i>Dados do Cliente</h4>
+                    <h4 class="font-semibold text-slate-800 mb-3">Dados do Cliente</h4>
                     <div class="grid md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">Nome Completo *</label>
-                            <input type="text" required class="w-full p-2 border rounded-md text-sm mt-1" placeholder="João da Silva">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">CPF *</label>
-                            <input type="text" required class="w-full p-2 border rounded-md text-sm mt-1" placeholder="000.000.000-00">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">E-mail *</label>
-                            <input type="email" required class="w-full p-2 border rounded-md text-sm mt-1" placeholder="joao@email.com">
-                        </div>
+                        <input type="text" required placeholder="Nome Completo *" class="p-2 border rounded-md text-sm">
+                        <input type="text" required placeholder="CPF *" class="p-2 border rounded-md text-sm">
+                        <input type="email" required placeholder="E-mail *" class="p-2 border rounded-md text-sm">
                     </div>
                 </div>
 
-                <div id="secao-checklist-completo" class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
-                    <h4 class="font-semibold text-slate-800"><i class="fa-solid fa-camera mr-2"></i>Checklist de Entrada & Vistoria do Aparelho</h4>
-                    
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">Equipamento / Modelo *</label>
-                            <input type="text" placeholder="Ex: iPhone 13 Pro 128GB / Dell Inspiron 15" class="w-full p-2 border rounded-md text-sm mt-1">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">Estado de Conservação Identificado</label>
-                            <div class="flex flex-wrap gap-3 mt-2 text-xs">
-                                <label><input type="checkbox"> Marcas de Uso/Riscos</label>
-                                <label><input type="checkbox"> Tela Trincada</label>
-                                <label><input type="checkbox"> Sinais de Oxidação</label>
-                                <label><input type="checkbox"> Liga/Sem Imagem</label>
-                            </div>
-                        </div>
+                <div id="secao-checklist-completo" class="bg-gray-50 p-4 rounded-lg border border-gray-200 opacity-50 pointer-events-none transition-opacity">
+                    <h4 class="font-semibold text-slate-800 mb-3">Checklist Visual (Análise Completa)</h4>
+                    <input type="text" placeholder="Equipamento / Modelo *" class="w-full p-2 border rounded-md text-sm mb-3">
+                    <div class="flex flex-wrap gap-4 text-sm text-gray-700 mb-3">
+                        <label><input type="checkbox" class="mr-1"> Tela Trincada</label>
+                        <label><input type="checkbox" class="mr-1"> Oxidação</label>
+                        <label><input type="checkbox" class="mr-1"> Riscos/Marcas</label>
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Anexar Fotos do Aparelho (Marcas, Avarias, N/S) *</label>
-                        <input type="file" multiple class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-white hover:file:bg-slate-700">
-                    </div>
+                    <input type="file" multiple class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-slate-800 file:text-white">
                 </div>
 
-                <div class="flex justify-between items-center pt-2">
-                    <span class="text-xs text-gray-500"><i class="fa-solid fa-print mr-1"></i>O sistema gerará a Ordem de Entrada impressa/PDF e enviará link de acesso.</span>
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-md transition">
-                        Gerar Ordem de Serviço (OS)
-                    </button>
+                <div class="text-right">
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-md transition">Gerar Ordem de Serviço</button>
                 </div>
             </form>
         </section>
 
+        <!-- ETAPA 4: ORÇAMENTO -->
         <section id="orcamento" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 4</span>
-                <h2 class="text-2xl font-bold mt-2">Aprovação de Orçamento (OS #1042)</h2>
-                <p class="text-gray-600">Confira o laudo técnico, valores discriminados e dê o aceite para início do serviço.</p>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Aprovação de Orçamento (OS #1042)</h2>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="md:col-span-2 space-y-4">
                     <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-microscope text-amber-600 mr-2"></i>Laudo Técnico do Aparelho</h4>
-                        <p class="text-xs text-gray-700 leading-relaxed">
-                            Detectada oxidação na placa mãe próxima ao conector da bateria e falha no módulo de exibição (Display OLED). Necessário banho químico na placa e substituição do módulo frontal.
-                        </p>
+                        <h4 class="font-bold text-slate-900 text-sm mb-1">Laudo Técnico</h4>
+                        <p class="text-xs text-gray-700">Detectada oxidação na placa mãe. Necessário banho químico e troca de tela frontal.</p>
                     </div>
-
                     <div class="border rounded-lg overflow-hidden">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900 text-white">
-                                <tr>
-                                    <th class="p-3">Item / Serviço</th>
-                                    <th class="p-3">Garantia</th>
-                                    <th class="p-3 text-right">Valor</th>
-                                </tr>
+                                <tr><th class="p-3">Serviço/Peça</th><th class="p-3 text-right">Valor</th></tr>
                             </thead>
                             <tbody class="divide-y text-gray-700">
-                                <tr>
-                                    <td class="p-3">Mão de Obra Especializada (Desoxidação)</td>
-                                    <td class="p-3">90 dias (Serviço)</td>
-                                    <td class="p-3 text-right">R$ 180,00</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3">Módulo Frontal Tela OLED (Original Fornecedor)</td>
-                                    <td class="p-3">90 dias + Fabricante</td>
-                                    <td class="p-3 text-right">R$ 450,00</td>
-                                </tr>
+                                <tr><td class="p-3">Mão de Obra (Desoxidação)</td><td class="p-3 text-right">R$ 180,00</td></tr>
+                                <tr><td class="p-3">Tela Frontal OLED</td><td class="p-3 text-right">R$ 450,00</td></tr>
                             </tbody>
                             <tfoot class="bg-gray-50 font-bold text-slate-900">
-                                <tr>
-                                    <td colspan="2" class="p-3 text-right">Total do Orçamento:</td>
-                                    <td class="p-3 text-right text-base text-amber-600">R$ 630,00</td>
-                                </tr>
+                                <tr><td class="p-3 text-right">Total:</td><td class="p-3 text-right text-amber-600 text-base">R$ 630,00</td></tr>
                             </tfoot>
                         </table>
                     </div>
-
-                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-900">
-                        <i class="fa-solid fa-circle-info mr-1 text-blue-600"></i> 
-                        <strong>Cliente trouxe a própria peça?</strong> A garantia cobrirá exclusivamente a mão de obra da instalação (90 dias). A garantia do componente é de responsabilidade do fornecedor da peça.
-                    </div>
                 </div>
-
-                <div class="bg-slate-900 text-white p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                <div class="bg-slate-900 text-white p-5 rounded-xl flex flex-col justify-between">
                     <div>
-                        <h4 class="font-bold text-amber-400 border-b border-slate-700 pb-2 mb-3"><i class="fa-solid fa-file-contract mr-2"></i>Termos de Aceite</h4>
+                        <h4 class="font-bold text-amber-400 mb-2">Termos de Aceite</h4>
                         <ul class="text-xs space-y-2 text-gray-300">
-                            <li><i class="fa-solid fa-clock text-amber-400 mr-1"></i> <strong>Prazo estimado:</strong> 3 dias úteis.</li>
-                            <li><i class="fa-solid fa-plane-arrival text-amber-400 mr-1"></i> Sujeito à disponibilidade de estoque ou prazos de importação.</li>
-                            <li><i class="fa-solid fa-shield text-amber-400 mr-1"></i> Garantia legal de 90 dias após a entrega.</li>
+                            <li><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Prazo: 3 dias úteis.</li>
+                            <li><i class="fa-solid fa-shield text-amber-400 mr-1"></i> Garantia 90 dias.</li>
                         </ul>
                     </div>
-
-                    <div class="space-y-2 pt-4">
-                        <button onclick="alert('Orçamento Aprovado com Aceite Digital Registrado!'); switchTab('status');" class="w-full bg-green-500 hover:bg-green-600 text-slate-950 font-bold py-2.5 rounded-md transition text-sm">
-                            <i class="fa-solid fa-thumbs-up mr-1"></i> Aprovar Orçamento
-                        </button>
-                        <button onclick="alert('Orçamento Recusado. O aparelho será montado para retirada.');" class="w-full bg-slate-800 hover:bg-red-600 text-white font-medium py-2 rounded-md transition text-xs">
-                            Recusar / Solicitar Devolução
-                        </button>
-                    </div>
+                    <button onclick="alert('Aprovado!'); switchTab('status');" class="w-full bg-green-500 hover:bg-green-600 text-slate-950 font-bold py-2.5 rounded-md mt-4 text-sm">Aprovar Orçamento</button>
                 </div>
             </div>
         </section>
 
+        <!-- ETAPA 5: STATUS DO REPARO -->
         <section id="status" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 5</span>
-                <h2 class="text-2xl font-bold mt-2">Acompanhamento da Ordem de Serviço</h2>
-                <p class="text-gray-600">Veja o progresso em tempo real e as fotos do serviço concluído.</p>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Acompanhamento da OS</h2>
             </div>
 
-            <div class="mb-8">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs font-semibold">
-                    <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check-circle block text-lg mb-1"></i> Entrada/Check-in</div>
-                    <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check-circle block text-lg mb-1"></i> Aprovado</div>
-                    <div class="p-3 bg-amber-100 text-amber-800 rounded-lg border-2 border-amber-500"><i class="fa-solid fa-wrench block text-lg mb-1 animate-spin"></i> Em Reparo</div>
-                    <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-vial block text-lg mb-1"></i> Testes Finalizados</div>
-                    <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-box-check block text-lg mb-1"></i> Pronto p/ Retirada</div>
-                </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs font-semibold mb-8">
+                <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check block text-lg mb-1"></i> Entrada</div>
+                <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check block text-lg mb-1"></i> Aprovado</div>
+                <div class="p-3 bg-amber-100 text-amber-800 rounded-lg border-2 border-amber-500"><i class="fa-solid fa-wrench block text-lg mb-1 animate-spin"></i> Em Reparo</div>
+                <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-vial block text-lg mb-1"></i> Testes</div>
+                <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-box block text-lg mb-1"></i> Pronto</div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
-                <h4 class="font-semibold text-slate-800 text-sm"><i class="fa-solid fa-images mr-2"></i>Mídias de Conclusão do Serviço</h4>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-slate-200 h-28 rounded-lg flex items-center justify-center text-gray-500 text-xs font-medium">Foto Tela Nova</div>
-                    <div class="bg-slate-200 h-28 rounded-lg flex items-center justify-center text-gray-500 text-xs font-medium">Foto Teste Toque</div>
-                    <div class="bg-slate-200 h-28 rounded-lg flex items-center justify-center text-gray-500 text-xs font-medium">Vídeo Aparelho Ligado</div>
-                    <div class="bg-slate-200 h-28 rounded-lg flex items-center justify-center text-gray-500 text-xs font-medium">Selo de Garantia Colado</div>
-                </div>
-                <div class="text-right">
-                    <button onclick="switchTab('checkout')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2 rounded-md text-sm transition">
-                        Aparelho Pronto? Ir para Checkout <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-right">
+                <button onclick="switchTab('checkout')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2 rounded-md text-sm transition">
+                    Ir para Checkout e NF <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
             </div>
         </section>
 
+        <!-- ETAPA 6: CHECKOUT E NOTA FISCAL ATUALIZADA -->
         <section id="checkout" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 6</span>
-                <h2 class="text-2xl font-bold mt-2">Retirada, Pagamento e Emissão de NF</h2>
-                <p class="text-gray-600">Finalize o atendimento e confira acessórios recomendados para seu modelo.</p>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Retirada, Pagamento e Emissão de NF</h2>
+                <p class="text-gray-600">Finalize o atendimento, baixe sua nota fiscal e confira acessórios recomendados.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                    <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-receipt mr-2"></i>Resumo do Pagamento</h4>
-                    <div class="text-xs space-y-1 text-gray-600">
-                        <p><strong>Cliente:</strong> João da Silva</p>
-                        <p><strong>CPF:</strong> 000.000.000-00</p>
-                        <p><strong>OS:</strong> #1042</p>
-                        <p class="text-sm font-bold text-slate-900 pt-2">Total a Pagar: R$ 630,00</p>
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- VISUALIZAÇÃO DA NOTA FISCAL -->
+                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                    <h4 class="font-bold text-slate-900 text-sm mb-4 w-full text-left"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>Sua Nota Fiscal</h4>
+                    
+                    <div id="nota-fiscal-img" class="cupom-fiscal text-xs w-full max-w-[320px]">
+                        <div class="text-center mb-4">
+                            <h2 class="font-bold text-base">TECHFIX OS</h2>
+                            <p>CNPJ: 00.000.000/0001-00</p>
+                            <p>Rua da Tecnologia, 123</p>
+                        </div>
+                        <div class="linha-tracejada"></div>
+                        <div class="mb-2">
+                            <p><strong>DANFE Simplificado</strong></p>
+                            <p>OS: #1042</p>
+                            <p>Cliente: João da Silva</p>
+                            <p>CPF: 000.000.000-00</p>
+                        </div>
+                        <div class="linha-tracejada"></div>
+                        <table class="w-full text-left mb-2">
+                            <thead>
+                                <tr><th>QTD</th><th>DESCRIÇÃO</th><th class="text-right">VALOR</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>Desoxidação</td><td class="text-right">R$ 180,00</td></tr>
+                                <tr><td>1</td><td>Tela OLED</td><td class="text-right">R$ 450,00</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="linha-tracejada"></div>
+                        <div class="text-right mb-4">
+                            <p class="font-bold text-sm">TOTAL: R$ 630,00</p>
+                            <p>Pagamento: PIX</p>
+                        </div>
+                        <div class="text-center text-[10px]">
+                            <p>Garantia Legal de 90 Dias Ativa.</p>
+                            <p>*** OBRIGADO PELA PREFERÊNCIA ***</p>
+                        </div>
                     </div>
-                    <button onclick="alert('Link de Pagamento Pix/Cartão Gerado!')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2 rounded-md text-xs transition">
-                        <i class="fa-solid fa-qrcode mr-1"></i> Gerar Link de Pagamento (PIX/Cartão)
-                    </button>
-                    <button onclick="alert('Nota Fiscal Emitida e enviada por e-mail!')" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-md text-xs transition">
-                        <i class="fa-solid fa-file-invoice-dollar mr-1"></i> Emitir Nota Fiscal
+
+                    <button onclick="gerarImagemNF(event)" class="mt-4 w-full max-w-[320px] bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-md text-sm transition flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Baixar Nota Fiscal (PDF)
                     </button>
                 </div>
 
-                <div class="md:col-span-2 bg-amber-50 p-4 rounded-lg border border-amber-200">
-                    <h4 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-bag-shopping text-amber-600 mr-2"></i>Acessórios Recomendados para seu Modelo</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="bg-white p-3 rounded-lg border text-center shadow-xs">
-                            <i class="fa-solid fa-mobile-screen text-2xl text-amber-500 mb-2"></i>
-                            <h5 class="font-bold text-xs">Película 3D de Vidro</h5>
-                            <p class="text-xs text-amber-600 font-bold mt-1">R$ 35,00</p>
-                            <button class="mt-2 w-full bg-slate-800 text-white text-xs py-1 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Adicionar</button>
+                <!-- VITRINE DE ACESSÓRIOS -->
+                <div class="bg-amber-50 p-5 rounded-lg border border-amber-200 h-fit">
+                    <h4 class="font-bold text-slate-900 text-sm mb-4"><i class="fa-solid fa-bag-shopping text-amber-600 mr-2"></i>Acessórios Compatíveis</h4>
+                    <div class="space-y-3">
+                        <div class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-mobile-screen text-2xl text-amber-500"></i>
+                                <div><h5 class="font-bold text-sm text-slate-800">Película 3D Vidro</h5><p class="text-xs text-amber-600 font-bold">R$ 35,00</p></div>
+                            </div>
+                            <button class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Add</button>
                         </div>
-                        <div class="bg-white p-3 rounded-lg border text-center shadow-xs">
-                            <i class="fa-solid fa-shield-cat text-2xl text-amber-500 mb-2"></i>
-                            <h5 class="font-bold text-xs">Capa Anti-Impacto</h5>
-                            <p class="text-xs text-amber-600 font-bold mt-1">R$ 50,00</p>
-                            <button class="mt-2 w-full bg-slate-800 text-white text-xs py-1 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Adicionar</button>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg border text-center shadow-xs">
-                            <i class="fa-solid fa-charging-station text-2xl text-amber-500 mb-2"></i>
-                            <h5 class="font-bold text-xs">Carregador Rápido 20W</h5>
-                            <p class="text-xs text-amber-600 font-bold mt-1">R$ 90,00</p>
-                            <button class="mt-2 w-full bg-slate-800 text-white text-xs py-1 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Adicionar</button>
+                        <div class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-shield-cat text-2xl text-amber-500"></i>
+                                <div><h5 class="font-bold text-sm text-slate-800">Capa Anti-Impacto</h5><p class="text-xs text-amber-600 font-bold">R$ 50,00</p></div>
+                            </div>
+                            <button class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Add</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ETAPA 7: GARANTIA -->
         <section id="garantia" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="border-b pb-4 mb-6">
                 <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 7</span>
-                <h2 class="text-2xl font-bold mt-2">Painel de Garantia & Validade Legal</h2>
-                <p class="text-gray-600">Acompanhamento do prazo legal de 90 dias após a conclusão do serviço.</p>
+                <h2 class="text-2xl font-bold mt-2 text-slate-900">Garantia Legal Ativa</h2>
             </div>
-
-            <div class="grid md:grid-cols-2 gap-6 items-center">
-                <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold bg-green-500 text-slate-950 px-2.5 py-1 rounded">GARANTIA ATIVA</span>
-                        <span class="text-xs text-gray-400">OS #1042</span>
-                    </div>
-
-                    <div class="space-y-1">
-                        <p class="text-xs text-gray-400">Dias Restantes da Garantia Legal:</p>
-                        <p class="text-4xl font-extrabold text-amber-400">78 <span class="text-lg font-normal text-white">/ 90 Dias</span></p>
-                    </div>
-
-                    <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
-                        <div class="bg-amber-400 h-full w-[86%]"></div>
-                    </div>
-
-                    <p class="text-xs text-gray-300">
-                        <i class="fa-solid fa-calendar-check text-amber-400 mr-1"></i> Data de Entrega: 27/08/2026<br>
-                        <i class="fa-solid fa-box-archive text-amber-400 mr-1"></i> Data de Arquivamento Automático (Dia 91): 27/11/2026
-                    </p>
+            
+            <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4 max-w-lg mx-auto">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold bg-green-500 text-slate-950 px-2.5 py-1 rounded">GARANTIA ATIVA</span>
+                    <span class="text-xs text-gray-400">OS #1042</span>
                 </div>
-
-                <div class="space-y-3 text-sm">
-                    <h4 class="font-bold text-slate-800"><i class="fa-solid fa-scale-balanced mr-2 text-amber-600"></i>Termos da Garantia Legal (CDC)</h4>
-                    <p class="text-xs text-gray-600 leading-relaxed">
-                        Em conformidade com o artigo 26 do Código de Defesa do Consumidor, o serviço prestado possui garantia legal de 90 dias corridos a contar da data de retirada do equipamento.
-                    </p>
-                    <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
-                        <li>A garantia cobre defeitos de fabricação da peça instalada e falhas na execução da mão de obra.</li>
-                        <li>A garantia é anulada em caso de quedas, contato com líquidos ou intervenção de terceiros.</li>
-                        <li>No 91º dia, o registro da OS é automaticamente arquivado no sistema.</li>
-                    </ul>
+                <div>
+                    <p class="text-xs text-gray-400">Dias Restantes da Garantia Legal:</p>
+                    <p class="text-4xl font-extrabold text-amber-400">90 <span class="text-lg font-normal text-white">/ 90 Dias</span></p>
                 </div>
+                <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-400 h-full w-[100%]"></div>
+                </div>
+                <p class="text-xs text-gray-300">
+                    <i class="fa-solid fa-calendar text-amber-400 mr-1"></i> Retirada: Hoje<br>
+                    <i class="fa-solid fa-box-archive text-amber-400 mr-1"></i> Arquivamento (Dia 91): Em 91 dias
+                </p>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-slate-900 text-gray-400 text-xs py-6 mt-12 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-            <p>TechFix OS - Sistema de Gestão de Assistência Técnica de Celulares e Computadores </p>
-            <p class="text-gray-500">Desenvolvido para o Projeto Scrum (A3) | Garantia Legal de 90 Dias Integrada [cite: 7, 12, 25]</p>
-        </div>
-    </footer>
-
+    <!-- SCRIPTS -->
     <script>
+        // Função de troca de abas
         function switchTab(tabId) {
-            // Esconde todas as abas
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove o destaque dos botões
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-amber-500', 'text-slate-900');
                 btn.classList.add('bg-slate-800');
             });
 
-            // Mostra a aba selecionada
             document.getElementById(tabId).classList.add('active');
-
-            // Destaque do botão ativo
+            
             const activeBtn = document.getElementById('btn-' + tabId);
             if(activeBtn) {
                 activeBtn.classList.remove('bg-slate-800');
                 activeBtn.classList.add('bg-amber-500', 'text-slate-900');
             }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Função de seleção do tipo de reparo (Etapa 2/3)
         function selectRepairType(type) {
             const cardExpress = document.getElementById('card-express');
             const cardLongo = document.getElementById('card-longo');
-            const radioExpress = document.getElementById('radio-express');
-            const radioLongo = document.getElementById('radio-longo');
             const secaoChecklist = document.getElementById('secao-checklist-completo');
 
             if (type === 'express') {
-                radioExpress.checked = true;
-                cardExpress.className = "cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl hover:shadow-md transition";
-                cardLongo.className = "cursor-pointer border-2 border-gray-200 p-5 rounded-xl hover:shadow-md transition";
+                document.getElementById('radio-express').checked = true;
+                cardExpress.classList.replace('border-gray-200', 'border-amber-500');
+                cardExpress.classList.add('bg-amber-50');
+                cardLongo.classList.replace('border-amber-500', 'border-gray-200');
+                cardLongo.classList.remove('bg-amber-50');
+                
                 secaoChecklist.style.opacity = '0.5';
+                secaoChecklist.style.pointerEvents = 'none';
             } else {
-                radioLongo.checked = true;
-                cardLongo.className = "cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl hover:shadow-md transition";
-                cardExpress.className = "cursor-pointer border-2 border-gray-200 p-5 rounded-xl hover:shadow-md transition";
+                document.getElementById('radio-longo').checked = true;
+                cardLongo.classList.replace('border-gray-200', 'border-amber-500');
+                cardLongo.classList.add('bg-amber-50');
+                cardExpress.classList.replace('border-amber-500', 'border-gray-200');
+                cardExpress.classList.remove('bg-amber-50');
+                
                 secaoChecklist.style.opacity = '1';
+                secaoChecklist.style.pointerEvents = 'auto';
             }
+        }
+
+        // Função de geração da Nota Fiscal (Etapa 6)
+        function gerarImagemNF(event) {
+            const elemento = document.getElementById('nota-fiscal-img');
+            const btn = event.currentTarget;
+            const textoOriginal = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando Documento...';
+            
+            const opcoes = {
+                margin:       10,
+                filename:     'TechFix_NF_OS1042.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opcoes).from(elemento).save().then(() => {
+                btn.innerHTML = textoOriginal;
+                alert('Nota Fiscal baixada com sucesso! A garantia legal de 90 dias já está contando no sistema.');
+            });
         }
     </script>
 </body>
