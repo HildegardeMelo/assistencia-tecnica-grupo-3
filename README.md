@@ -1,6 +1,6 @@
 # 🛠️ TechFlix OS
 
-https://assistencia-tecnica-grupo-3.vercel.app/
+https://techflix-os-g3.vercel.app/
 
 > Plataforma web para gestão de Ordens de Serviço, acompanhamento de reparos em tempo real, emissão de orçamentos e notas fiscais, com conformidade legal de garantia.
 
