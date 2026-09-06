@@ -11,7 +11,7 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
 ## 👥 Integrantes do Grupo
 
 - Anna Maria Cuano Schmidt| 12824129737 - responsavel pelos codigos
-- Kelly Bulhoes de Paula | 12824213868 - responsavel por issues e fluxograma
+- Kelly Bulhoes de Paula | 12824213868 - responsavel por criação do fluxograma
 - Hildegarde Nascimento de Melo | 12824144646 - responsavel por issues e Readname
 - Derik do Nascimento Silva | 12824125448 - responsavel por issues e readname 
 - Osorio Jacome Xavier de Mesquita Neto  | 12824211707 - responsavel por issues e readname
