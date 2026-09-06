@@ -15,7 +15,7 @@ Este projeto foi desenvolvido para otimizar o fluxo de atendimento em assistênc
 - Hildegarde Nascimento de Melo | 12824144646 - responsavel por issues e Readname
 - Derik do Nascimento Silva | 12824125448 - responsavel por issues e readname 
 - Osorio Jacome Xavier de Mesquita Neto  | 12824211707 - responsavel por issues e readname
-- 
+  
 
  ## 🎯 Funcionalidades Principais 
 
