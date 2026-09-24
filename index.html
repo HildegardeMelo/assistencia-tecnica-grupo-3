@@ -1,513 +1,884 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TechFix OS - Assistência Técnica Especializada</title>
-    
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <!-- Biblioteca para gerar PDF/Imagem da Nota Fiscal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
-        :root {
-            --primary-amber: #F59E0B;
-            --secondary-slate: #0F172A;
-            --bg-base: #F3F4F6;
-            --card-white: #FFFFFF;
-        }
+      :root {
+        --primary-amber: #f59e0b;
+        --secondary-slate: #0f172a;
+        --bg-base: #f3f4f6;
+        --card-white: #ffffff;
+      }
 
-        body {
-            background-color: var(--bg-base);
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+      body {
+        background-color: var(--bg-base);
+        font-family: "Inter", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
 
-        /* Controle de Abas */
-        .tab-content { display: none; }
-        .tab-content.active { 
-            display: block; 
-            animation: fadeIn 0.4s ease-in-out;
-        }
+      /* Controle de Abas */
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.4s ease-in-out;
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        /* Estilo do Cupom Fiscal para a Etapa 6 */
-        .cupom-fiscal {
-            background-color: #fff;
-            color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            border: 1px dashed #ccc;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .linha-tracejada {
-            border-top: 1px dashed #000;
-            margin: 10px 0;
-        }
+      /* Estilo do Cupom Fiscal para a Etapa 6 */
+      .cupom-fiscal {
+        background-color: #fff;
+        color: #000;
+        font-family: "Courier New", Courier, monospace;
+        padding: 20px;
+        border: 1px dashed #ccc;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .linha-tracejada {
+        border-top: 1px dashed #000;
+        margin: 10px 0;
+      }
     </style>
-</head>
-<body class="text-gray-800">
-
+  </head>
+  <body class="text-gray-800">
     <!-- HEADER / NAVEGAÇÃO -->
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-wrench text-amber-500 text-2xl"></i>
-                <h1 class="text-xl font-bold tracking-wide">TechFix <span class="text-amber-500">OS</span></h1>
-            </div>
-            
-            <nav class="flex flex-wrap gap-2 text-sm font-medium">
-                <button onclick="switchTab('triagem')" class="nav-btn bg-amber-500 text-slate-900 px-3 py-2 rounded-lg transition active-btn" id="btn-triagem">
-                    <i class="fa-solid fa-comments mr-1"></i> 1. Triagem
-                </button>
-                <button onclick="switchTab('entrada')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-entrada">
-                    <i class="fa-solid fa-file-signature mr-1"></i> 2/3. Entrada / OS
-                </button>
-                <button onclick="switchTab('orcamento')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-orcamento">
-                    <i class="fa-solid fa-calculator mr-1"></i> 4. Orçamento
-                </button>
-                <button onclick="switchTab('status')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-status">
-                    <i class="fa-solid fa-list-check mr-1"></i> 5. Status Reparo
-                </button>
-                <button onclick="switchTab('checkout')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-checkout">
-                    <i class="fa-solid fa-cash-register mr-1"></i> 6. Checkout & NF
-                </button>
-                <button onclick="switchTab('garantia')" class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition" id="btn-garantia">
-                    <i class="fa-solid fa-shield-halved mr-1"></i> 7. Garantia 90D
-                </button>
-            </nav>
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4"
+      >
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-wrench text-amber-500 text-2xl"></i>
+          <h1 class="text-xl font-bold tracking-wide">
+            TechFix <span class="text-amber-500">OS</span>
+          </h1>
         </div>
+
+        <nav class="flex flex-wrap gap-2 text-sm font-medium">
+          <button
+            onclick="switchTab('triagem')"
+            class="nav-btn bg-amber-500 text-slate-900 px-3 py-2 rounded-lg transition active-btn"
+            id="btn-triagem"
+          >
+            <i class="fa-solid fa-comments mr-1"></i> 1. Triagem
+          </button>
+          <button
+            onclick="switchTab('entrada')"
+            class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition"
+            id="btn-entrada"
+          >
+            <i class="fa-solid fa-file-signature mr-1"></i> 2/3. Entrada / OS
+          </button>
+          <button
+            onclick="switchTab('orcamento')"
+            class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition"
+            id="btn-orcamento"
+          >
+            <i class="fa-solid fa-calculator mr-1"></i> 4. Orçamento
+          </button>
+          <button
+            onclick="switchTab('status')"
+            class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition"
+            id="btn-status"
+          >
+            <i class="fa-solid fa-list-check mr-1"></i> 5. Status Reparo
+          </button>
+          <button
+            onclick="switchTab('checkout')"
+            class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition"
+            id="btn-checkout"
+          >
+            <i class="fa-solid fa-cash-register mr-1"></i> 6. Checkout & NF
+          </button>
+          <button
+            onclick="switchTab('garantia')"
+            class="nav-btn bg-slate-800 hover:bg-amber-500 hover:text-slate-900 px-3 py-2 rounded-lg transition"
+            id="btn-garantia"
+          >
+            <i class="fa-solid fa-shield-halved mr-1"></i> 7. Garantia 90D
+          </button>
+        </nav>
+      </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- ETAPA 1: TRIAGEM -->
+      <section
+        id="triagem"
+        class="tab-content active bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 1</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Triagem & Pré-Atendimento
+          </h2>
+          <p class="text-gray-600">
+            Contato inicial via WhatsApp ou balcão para direcionamento ao
+            sistema.
+          </p>
+        </div>
 
-        <!-- ETAPA 1: TRIAGEM -->
-        <section id="triagem" class="tab-content active bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 1</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Triagem & Pré-Atendimento</h2>
-                <p class="text-gray-600">Contato inicial via WhatsApp ou balcão para direcionamento ao sistema.</p>
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4">
+            <h3 class="text-lg font-semibold text-slate-800">
+              <i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i
+              >Inicie seu atendimento online
+            </h3>
+            <div
+              class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3"
+            >
+              <input
+                type="text"
+                id="wpp-nome"
+                placeholder="Nome Completo"
+                class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              />
+              <input
+                type="tel"
+                id="wpp-tel"
+                placeholder="(00) 00000-0000"
+                class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              />
+              <button
+                onclick="iniciarWhatsApp()"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-md transition flex items-center justify-center gap-2"
+              >
+                <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4">
+            <h3 class="text-lg font-semibold text-amber-400">
+              <i class="fa-solid fa-store mr-2"></i>Atendimento Presencial
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-300">
+              <li>
+                <i class="fa-solid fa-check text-green-400 mr-2"></i>Avaliação
+                imediata no balcão.
+              </li>
+              <li>
+                <i class="fa-solid fa-check text-green-400 mr-2"></i>Abertura
+                ágil de OS.
+              </li>
+            </ul>
+            <button
+              onclick="switchTab('entrada')"
+              class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2.5 rounded-md transition mt-4"
+            >
+              Avançar para Abertura de OS
+              <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ETAPA 2 & 3: ENTRADA E CHECKLIST -->
+      <section
+        id="entrada"
+        class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 2 e 3</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Recepção do Aparelho
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4 mb-8">
+          <div
+            id="card-express"
+            onclick="selectRepairType('express')"
+            class="cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl transition"
+          >
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-slate-900">
+                <i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Reparo
+                Rápido (1h)
+              </h3>
+              <input
+                type="radio"
+                name="tipo_reparo"
+                id="radio-express"
+                checked
+              />
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+              Cadastro rápido para emissão de NF e reparo imediato.
+            </p>
+          </div>
+          <div
+            id="card-longo"
+            onclick="selectRepairType('longo')"
+            class="cursor-pointer border-2 border-gray-200 p-5 rounded-xl transition"
+          >
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-slate-900">
+                <i class="fa-solid fa-microchip text-slate-700 mr-2"></i>Análise
+                Completa
+              </h3>
+              <input type="radio" name="tipo_reparo" id="radio-longo" />
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+              Diagnóstico avançado, orçamentos longos e importações.
+            </p>
+          </div>
+        </div>
+
+        <form
+          onsubmit="
+            event.preventDefault();
+            alert('OS Criada com Sucesso!');
+            switchTab('orcamento');
+          "
+          class="space-y-6"
+        >
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h4 class="font-semibold text-slate-800 mb-3">Dados do Cliente</h4>
+            <div class="grid md:grid-cols-3 gap-4">
+              <input
+                type="text"
+                id="input-cliente"
+                required
+                placeholder="Nome Completo *"
+                class="p-2 border rounded-md text-sm"
+                onchange="atualizarClienteNF(this.value)"
+              />
+              <input
+                type="text"
+                id="input-cpf"
+                required
+                placeholder="CPF *"
+                class="p-2 border rounded-md text-sm"
+                onchange="atualizarCpfNF(this.value)"
+              />
+              <input
+                type="email"
+                required
+                placeholder="E-mail *"
+                class="p-2 border rounded-md text-sm"
+              />
+            </div>
+          </div>
+
+          <div
+            id="secao-checklist-completo"
+            class="bg-gray-50 p-4 rounded-lg border border-gray-200 opacity-50 pointer-events-none transition-opacity"
+          >
+            <h4 class="font-semibold text-slate-800 mb-3">
+              Checklist Visual (Análise Completa)
+            </h4>
+            <input
+              type="text"
+              placeholder="Equipamento / Modelo *"
+              class="w-full p-2 border rounded-md text-sm mb-3"
+            />
+            <div class="flex flex-wrap gap-4 text-sm text-gray-700 mb-3">
+              <label
+                ><input type="checkbox" class="mr-1" /> Tela Trincada</label
+              >
+              <label><input type="checkbox" class="mr-1" /> Oxidação</label>
+              <label
+                ><input type="checkbox" class="mr-1" /> Riscos/Marcas</label
+              >
+            </div>
+            <input
+              type="file"
+              multiple
+              class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-slate-800 file:text-white"
+            />
+          </div>
+
+          <div class="text-right">
+            <button
+              type="submit"
+              class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-md transition"
+            >
+              Gerar Ordem de Serviço
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ETAPA 4: ORÇAMENTO DINÂMICO -->
+      <section
+        id="orcamento"
+        class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 4</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Aprovação de Orçamento (OS #1042)
+          </h2>
+          <p class="text-gray-600">
+            Simule alterações de orçamento (acréscimos ou descontos) e veja o
+            impacto instantâneo na Nota Fiscal.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 space-y-4">
+            <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+              <h4 class="font-bold text-slate-900 text-sm mb-1">
+                Laudo Técnico
+              </h4>
+              <p class="text-xs text-gray-700">
+                Detectada oxidação na placa mãe e tela danificada. É possível
+                incluir ou remover serviços abaixo:
+              </p>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-slate-800"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i>Inicie seu atendimento online</h3>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                        <input type="text" placeholder="Nome Completo" class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-                        <input type="tel" placeholder="(00) 00000-0000" class="w-full p-2 border rounded-md text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-                        <button onclick="alert('Redirecionando para WhatsApp...')" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-md transition flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4">
-                    <h3 class="text-lg font-semibold text-amber-400"><i class="fa-solid fa-store mr-2"></i>Atendimento Presencial</h3>
-                    <ul class="space-y-2 text-sm text-gray-300">
-                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Avaliação imediata no balcão.</li>
-                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Abertura ágil de OS.</li>
-                    </ul>
-                    <button onclick="switchTab('entrada')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2.5 rounded-md transition mt-4">
-                        Avançar para Abertura de OS <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ETAPA 2 & 3: ENTRADA E CHECKLIST -->
-        <section id="entrada" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 2 e 3</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Recepção do Aparelho</h2>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-4 mb-8">
-                <div id="card-express" onclick="selectRepairType('express')" class="cursor-pointer border-2 border-amber-500 bg-amber-50 p-5 rounded-xl transition">
-                    <div class="flex justify-between items-center"><h3 class="font-bold text-slate-900"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Reparo Rápido (1h)</h3><input type="radio" name="tipo_reparo" id="radio-express" checked></div>
-                    <p class="text-sm text-gray-600 mt-2">Cadastro rápido para emissão de NF e reparo imediato.</p>
-                </div>
-                <div id="card-longo" onclick="selectRepairType('longo')" class="cursor-pointer border-2 border-gray-200 p-5 rounded-xl transition">
-                    <div class="flex justify-between items-center"><h3 class="font-bold text-slate-900"><i class="fa-solid fa-microchip text-slate-700 mr-2"></i>Análise Completa</h3><input type="radio" name="tipo_reparo" id="radio-longo"></div>
-                    <p class="text-sm text-gray-600 mt-2">Diagnóstico avançado, orçamentos longos e importações.</p>
-                </div>
-            </div>
-
-            <form onsubmit="event.preventDefault(); alert('OS Criada com Sucesso!'); switchTab('orcamento');" class="space-y-6">
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h4 class="font-semibold text-slate-800 mb-3">Dados do Cliente</h4>
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <input type="text" id="input-cliente" required placeholder="Nome Completo *" class="p-2 border rounded-md text-sm" onchange="atualizarClienteNF(this.value)">
-                        <input type="text" id="input-cpf" required placeholder="CPF *" class="p-2 border rounded-md text-sm" onchange="atualizarCpfNF(this.value)">
-                        <input type="email" required placeholder="E-mail *" class="p-2 border rounded-md text-sm">
-                    </div>
-                </div>
-
-                <div id="secao-checklist-completo" class="bg-gray-50 p-4 rounded-lg border border-gray-200 opacity-50 pointer-events-none transition-opacity">
-                    <h4 class="font-semibold text-slate-800 mb-3">Checklist Visual (Análise Completa)</h4>
-                    <input type="text" placeholder="Equipamento / Modelo *" class="w-full p-2 border rounded-md text-sm mb-3">
-                    <div class="flex flex-wrap gap-4 text-sm text-gray-700 mb-3">
-                        <label><input type="checkbox" class="mr-1"> Tela Trincada</label>
-                        <label><input type="checkbox" class="mr-1"> Oxidação</label>
-                        <label><input type="checkbox" class="mr-1"> Riscos/Marcas</label>
-                    </div>
-                    <input type="file" multiple class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-slate-800 file:text-white">
-                </div>
-
-                <div class="text-right">
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-md transition">Gerar Ordem de Serviço</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- ETAPA 4: ORÇAMENTO DINÂMICO -->
-        <section id="orcamento" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 4</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Aprovação de Orçamento (OS #1042)</h2>
-                <p class="text-gray-600">Simule alterações de orçamento (acréscimos ou descontos) e veja o impacto instantâneo na Nota Fiscal.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 space-y-4">
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1">Laudo Técnico</h4>
-                        <p class="text-xs text-gray-700">Detectada oxidação na placa mãe e tela danificada. É possível incluir ou remover serviços abaixo:</p>
-                    </div>
-
-                    <!-- BOTÕES DE AJUSTE DE ORÇAMENTO -->
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Ajustar Itens do Orçamento:</h4>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <button onclick="adicionarItemOrcamento('Bateria Nova Original', 150)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition">
-                                + Incluir Bateria (R$ 150)
-                            </button>
-                            <button onclick="adicionarItemOrcamento('Limpeza Preventiva/Termica', 80)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition">
-                                + Incluir Pasta Térmica (R$ 80)
-                            </button>
-                            <button onclick="removerUltimoItem()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded transition">
-                                - Remover Último Item
-                            </button>
-                            <button onclick="aplicarDesconto(10)" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded transition">
-                                % Aplicar 10% Desconto PIX
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- TABELA DE ITENS DO ORÇAMENTO (Sincronizada com a NF) -->
-                    <div class="border rounded-lg overflow-hidden">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-900 text-white">
-                                <tr><th class="p-3">Serviço/Peça</th><th class="p-3 text-right">Valor</th></tr>
-                            </thead>
-                            <tbody id="tabela-orcamento-corpo" class="divide-y text-gray-700">
-                                <!-- Preenchido dinamicamente pelo JavaScript -->
-                            </tbody>
-                            <tfoot class="bg-gray-50 font-bold text-slate-900">
-                                <tr><td class="p-3 text-right">Total Atual:</td><td id="total-orcamento-texto" class="p-3 text-right text-amber-600 text-base">R$ 630,00</td></tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 text-white p-5 rounded-xl flex flex-col justify-between">
-                    <div>
-                        <h4 class="font-bold text-amber-400 mb-2">Termos de Aceite</h4>
-                        <ul class="text-xs space-y-2 text-gray-300">
-                            <li><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Prazo: 3 dias úteis.</li>
-                            <li><i class="fa-solid fa-shield text-amber-400 mr-1"></i> Garantia 90 dias.</li>
-                        </ul>
-                    </div>
-                    <button onclick="alert('Orçamento Aprovado!'); switchTab('status');" class="w-full bg-green-500 hover:bg-green-600 text-slate-950 font-bold py-2.5 rounded-md mt-4 text-sm">Aprovar Orçamento</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ETAPA 5: STATUS DO REPARO -->
-        <section id="status" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 5</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Acompanhamento da OS</h2>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs font-semibold mb-8">
-                <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check block text-lg mb-1"></i> Entrada</div>
-                <div class="p-3 bg-green-100 text-green-800 rounded-lg"><i class="fa-solid fa-check block text-lg mb-1"></i> Aprovado</div>
-                <div class="p-3 bg-amber-100 text-amber-800 rounded-lg border-2 border-amber-500"><i class="fa-solid fa-wrench block text-lg mb-1 animate-spin"></i> Em Reparo</div>
-                <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-vial block text-lg mb-1"></i> Testes</div>
-                <div class="p-3 bg-gray-100 text-gray-500 rounded-lg"><i class="fa-solid fa-box block text-lg mb-1"></i> Pronto</div>
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-right">
-                <button onclick="switchTab('checkout')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2 rounded-md text-sm transition">
-                    Ir para Checkout e NF <i class="fa-solid fa-arrow-right ml-1"></i>
+            <!-- BOTÕES DE AJUSTE DE ORÇAMENTO -->
+            <div
+              class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2"
+            >
+              <h4
+                class="font-bold text-slate-800 text-xs uppercase tracking-wider"
+              >
+                Ajustar Itens do Orçamento:
+              </h4>
+              <div class="flex flex-wrap gap-2 text-xs">
+                <button
+                  onclick="adicionarItemOrcamento('Bateria Nova Original', 150)"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition"
+                >
+                  + Incluir Bateria (R$ 150)
                 </button>
+                <button
+                  onclick="
+                    adicionarItemOrcamento('Limpeza Preventiva/Termica', 80)
+                  "
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition"
+                >
+                  + Incluir Pasta Térmica (R$ 80)
+                </button>
+                <button
+                  onclick="removerUltimoItem()"
+                  class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded transition"
+                >
+                  - Remover Último Item
+                </button>
+                <button
+                  onclick="aplicarDesconto(10)"
+                  class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded transition"
+                >
+                  % Aplicar 10% Desconto PIX
+                </button>
+              </div>
             </div>
-        </section>
 
-        <!-- ETAPA 6: CHECKOUT E NOTA FISCAL DINÂMICA -->
-        <section id="checkout" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 6</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Retirada, Pagamento e Emissão de NF</h2>
-                <p class="text-gray-600">A Nota Fiscal abaixo reflete em tempo real as alterações do orçamento e acessórios adicionados.</p>
+            <!-- TABELA DE ITENS DO ORÇAMENTO (Sincronizada com a NF) -->
+            <div class="border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900 text-white">
+                  <tr>
+                    <th class="p-3">Serviço/Peça</th>
+                    <th class="p-3 text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="tabela-orcamento-corpo"
+                  class="divide-y text-gray-700"
+                >
+                  <!-- Preenchido dinamicamente pelo JavaScript -->
+                </tbody>
+                <tfoot class="bg-gray-50 font-bold text-slate-900">
+                  <tr>
+                    <td class="p-3 text-right">Total Atual:</td>
+                    <td
+                      id="total-orcamento-texto"
+                      class="p-3 text-right text-amber-600 text-base"
+                    >
+                      R$ 630,00
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
+          </div>
 
-            <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <!-- VISUALIZAÇÃO DA NOTA FISCAL DINÂMICA -->
-                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
-                    <h4 class="font-bold text-slate-900 text-sm mb-4 w-full text-left"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>Sua Nota Fiscal Emitida</h4>
-                    
-                    <div id="nota-fiscal-img" class="cupom-fiscal text-xs w-full max-w-[320px]">
-                        <div class="text-center mb-4">
-                            <h2 class="font-bold text-base">TECHFIX OS</h2>
-                            <p>CNPJ: 00.000.000/0001-00</p>
-                            <p>Rua da Tecnologia, 123</p>
-                        </div>
-                        <div class="linha-tracejada"></div>
-                        <div class="mb-2">
-                            <p><strong>DANFE Simplificado</strong></p>
-                            <p>OS: #1042</p>
-                            <p>Cliente: <span id="nf-nome-cliente">João da Silva</span></p>
-                            <p>CPF: <span id="nf-cpf-cliente">000.000.000-00</span></p>
-                        </div>
-                        <div class="linha-tracejada"></div>
-                        <table class="w-full text-left mb-2">
-                            <thead>
-                                <tr><th>QTD</th><th>DESCRIÇÃO</th><th class="text-right">VALOR</th></tr>
-                            </thead>
-                            <tbody id="nf-itens-corpo">
-                                <!-- Preenchido dinamicamente via JS -->
-                            </tbody>
-                        </table>
-                        <div class="linha-tracejada"></div>
-                        <div class="text-right mb-4">
-                            <p class="font-bold text-sm">TOTAL: <span id="nf-total-valor">R$ 630,00</span></p>
-                            <p>Pagamento: PIX / Cartão</p>
-                        </div>
-                        <div class="text-center text-[10px]">
-                            <p>Garantia Legal de 90 Dias Ativa.</p>
-                            <p>*** OBRIGADO PELA PREFERÊNCIA ***</p>
-                        </div>
-                    </div>
-
-                    <button onclick="gerarImagemNF(event)" class="mt-4 w-full max-w-[320px] bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-md text-sm transition flex justify-center items-center gap-2">
-                        <i class="fa-solid fa-download"></i> Baixar Nota Fiscal (PDF)
-                    </button>
-                </div>
-
-                <!-- VITRINE DE ACESSÓRIOS (Aumenta o total da NF) -->
-                <div class="bg-amber-50 p-5 rounded-lg border border-amber-200 h-fit space-y-4">
-                    <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-bag-shopping text-amber-600 mr-2"></i>Acessórios Compatíveis (Aumentam o Orçamento)</h4>
-                    <div class="space-y-3">
-                        <div class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-mobile-screen text-2xl text-amber-500"></i>
-                                <div><h5 class="font-bold text-sm text-slate-800">Película 3D Vidro</h5><p class="text-xs text-amber-600 font-bold">R$ 35,00</p></div>
-                            </div>
-                            <button onclick="adicionarItemOrcamento('Película 3D Vidro', 35)" class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Incluir na NF</button>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-shield-cat text-2xl text-amber-500"></i>
-                                <div><h5 class="font-bold text-sm text-slate-800">Capa Anti-Impacto</h5><p class="text-xs text-amber-600 font-bold">R$ 50,00</p></div>
-                            </div>
-                            <button onclick="adicionarItemOrcamento('Capa Anti-Impacto', 50)" class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition">+ Incluir na NF</button>
-                        </div>
-                    </div>
-                </div>
+          <div
+            class="bg-slate-900 text-white p-5 rounded-xl flex flex-col justify-between"
+          >
+            <div>
+              <h4 class="font-bold text-amber-400 mb-2">Termos de Aceite</h4>
+              <ul class="text-xs space-y-2 text-gray-300">
+                <li>
+                  <i class="fa-solid fa-clock text-amber-400 mr-1"></i> Prazo: 3
+                  dias úteis.
+                </li>
+                <li>
+                  <i class="fa-solid fa-shield text-amber-400 mr-1"></i>
+                  Garantia 90 dias.
+                </li>
+              </ul>
             </div>
-        </section>
+            <button
+              onclick="
+                alert('Orçamento Aprovado!');
+                switchTab('status');
+              "
+              class="w-full bg-green-500 hover:bg-green-600 text-slate-950 font-bold py-2.5 rounded-md mt-4 text-sm"
+            >
+              Aprovar Orçamento
+            </button>
+          </div>
+        </div>
+      </section>
 
-        <!-- ETAPA 7: GARANTIA -->
-        <section id="garantia" class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div class="border-b pb-4 mb-6">
-                <span class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase">Etapa 7</span>
-                <h2 class="text-2xl font-bold mt-2 text-slate-900">Garantia Legal Ativa</h2>
-            </div>
-            
-            <div class="bg-slate-900 text-white p-6 rounded-xl space-y-4 max-w-lg mx-auto">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold bg-green-500 text-slate-950 px-2.5 py-1 rounded">GARANTIA ATIVA</span>
-                    <span class="text-xs text-gray-400">OS #1042</span>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-400">Dias Restantes da Garantia Legal:</p>
-                    <p class="text-4xl font-extrabold text-amber-400">90 <span class="text-lg font-normal text-white">/ 90 Dias</span></p>
-                </div>
-                <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
-                    <div class="bg-amber-400 h-full w-[100%]"></div>
-                </div>
-                <p class="text-xs text-gray-300">
-                    <i class="fa-solid fa-calendar text-amber-400 mr-1"></i> Retirada: Hoje<br>
-                    <i class="fa-solid fa-box-archive text-amber-400 mr-1"></i> Arquivamento (Dia 91): Em 91 dias
+      <!-- ETAPA 5: STATUS DO REPARO -->
+      <section
+        id="status"
+        class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 5</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Acompanhamento da OS
+          </h2>
+        </div>
+
+        <div
+          class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs font-semibold mb-8"
+        >
+          <div class="p-3 bg-green-100 text-green-800 rounded-lg">
+            <i class="fa-solid fa-check block text-lg mb-1"></i> Entrada
+          </div>
+          <div class="p-3 bg-green-100 text-green-800 rounded-lg">
+            <i class="fa-solid fa-check block text-lg mb-1"></i> Aprovado
+          </div>
+          <div
+            class="p-3 bg-amber-100 text-amber-800 rounded-lg border-2 border-amber-500"
+          >
+            <i class="fa-solid fa-wrench block text-lg mb-1 animate-spin"></i>
+            Em Reparo
+          </div>
+          <div class="p-3 bg-gray-100 text-gray-500 rounded-lg">
+            <i class="fa-solid fa-vial block text-lg mb-1"></i> Testes
+          </div>
+          <div class="p-3 bg-gray-100 text-gray-500 rounded-lg">
+            <i class="fa-solid fa-box block text-lg mb-1"></i> Pronto
+          </div>
+        </div>
+
+        <div
+          class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-right"
+        >
+          <button
+            onclick="switchTab('checkout')"
+            class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2 rounded-md text-sm transition"
+          >
+            Ir para Checkout e NF <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ETAPA 6: CHECKOUT E NOTA FISCAL DINÂMICA -->
+      <section
+        id="checkout"
+        class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 6</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Retirada, Pagamento e Emissão de NF
+          </h2>
+          <p class="text-gray-600">
+            A Nota Fiscal abaixo reflete em tempo real as alterações do
+            orçamento e acessórios adicionados.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <!-- VISUALIZAÇÃO DA NOTA FISCAL DINÂMICA -->
+          <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+            <h4 class="font-bold text-slate-900 text-sm mb-4 w-full text-left">
+              <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Sua Nota
+              Fiscal Emitida
+            </h4>
+
+            <div
+              id="nota-fiscal-img"
+              class="cupom-fiscal text-xs w-full max-w-[320px]"
+            >
+              <div class="text-center mb-4">
+                <h2 class="font-bold text-base">TECHFIX OS</h2>
+                <p>CNPJ: 00.000.000/0001-00</p>
+                <p>Rua da Tecnologia, 123</p>
+              </div>
+              <div class="linha-tracejada"></div>
+              <div class="mb-2">
+                <p><strong>DANFE Simplificado</strong></p>
+                <p>OS: #1042</p>
+                <p>Cliente: <span id="nf-nome-cliente">João da Silva</span></p>
+                <p>CPF: <span id="nf-cpf-cliente">000.000.000-00</span></p>
+              </div>
+              <div class="linha-tracejada"></div>
+              <table class="w-full text-left mb-2">
+                <thead>
+                  <tr>
+                    <th>QTD</th>
+                    <th>DESCRIÇÃO</th>
+                    <th class="text-right">VALOR</th>
+                  </tr>
+                </thead>
+                <tbody id="nf-itens-corpo">
+                  <!-- Preenchido dinamicamente via JS -->
+                </tbody>
+              </table>
+              <div class="linha-tracejada"></div>
+              <div class="text-right mb-4">
+                <p class="font-bold text-sm">
+                  TOTAL: <span id="nf-total-valor">R$ 630,00</span>
                 </p>
+                <p>Pagamento: PIX / Cartão</p>
+              </div>
+              <div class="text-center text-[10px]">
+                <p>Garantia Legal de 90 Dias Ativa.</p>
+                <p>*** OBRIGADO PELA PREFERÊNCIA ***</p>
+              </div>
             </div>
-        </section>
 
+            <button
+              onclick="gerarImagemNF(event)"
+              class="mt-4 w-full max-w-[320px] bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-md text-sm transition flex justify-center items-center gap-2"
+            >
+              <i class="fa-solid fa-download"></i> Baixar Nota Fiscal (PDF)
+            </button>
+          </div>
+
+          <!-- VITRINE DE ACESSÓRIOS (Aumenta o total da NF) -->
+          <div
+            class="bg-amber-50 p-5 rounded-lg border border-amber-200 h-fit space-y-4"
+          >
+            <h4 class="font-bold text-slate-900 text-sm">
+              <i class="fa-solid fa-bag-shopping text-amber-600 mr-2"></i
+              >Acessórios Compatíveis (Aumentam o Orçamento)
+            </h4>
+            <div class="space-y-3">
+              <div
+                class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm"
+              >
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fa-solid fa-mobile-screen text-2xl text-amber-500"
+                  ></i>
+                  <div>
+                    <h5 class="font-bold text-sm text-slate-800">
+                      Película 3D Vidro
+                    </h5>
+                    <p class="text-xs text-amber-600 font-bold">R$ 35,00</p>
+                  </div>
+                </div>
+                <button
+                  onclick="adicionarItemOrcamento('Película 3D Vidro', 35)"
+                  class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition"
+                >
+                  + Incluir na NF
+                </button>
+              </div>
+              <div
+                class="bg-white p-3 rounded-lg border flex justify-between items-center shadow-sm"
+              >
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-shield-cat text-2xl text-amber-500"></i>
+                  <div>
+                    <h5 class="font-bold text-sm text-slate-800">
+                      Capa Anti-Impacto
+                    </h5>
+                    <p class="text-xs text-amber-600 font-bold">R$ 50,00</p>
+                  </div>
+                </div>
+                <button
+                  onclick="adicionarItemOrcamento('Capa Anti-Impacto', 50)"
+                  class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded hover:bg-amber-500 hover:text-slate-900 transition"
+                >
+                  + Incluir na NF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ETAPA 7: GARANTIA -->
+      <section
+        id="garantia"
+        class="tab-content bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      >
+        <div class="border-b pb-4 mb-6">
+          <span
+            class="text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full uppercase"
+            >Etapa 7</span
+          >
+          <h2 class="text-2xl font-bold mt-2 text-slate-900">
+            Garantia Legal Ativa
+          </h2>
+        </div>
+
+        <div
+          class="bg-slate-900 text-white p-6 rounded-xl space-y-4 max-w-lg mx-auto"
+        >
+          <div class="flex justify-between items-center">
+            <span
+              class="text-xs font-bold bg-green-500 text-slate-950 px-2.5 py-1 rounded"
+              >GARANTIA ATIVA</span
+            >
+            <span class="text-xs text-gray-400">OS #1042</span>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">
+              Dias Restantes da Garantia Legal:
+            </p>
+            <p class="text-4xl font-extrabold text-amber-400">
+              90 <span class="text-lg font-normal text-white">/ 90 Dias</span>
+            </p>
+          </div>
+          <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-amber-400 h-full w-[100%]"></div>
+          </div>
+          <p class="text-xs text-gray-300">
+            <i class="fa-solid fa-calendar text-amber-400 mr-1"></i> Retirada:
+            Hoje<br />
+            <i class="fa-solid fa-box-archive text-amber-400 mr-1"></i>
+            Arquivamento (Dia 91): Em 91 dias
+          </p>
+        </div>
+      </section>
     </main>
 
     <!-- SCRIPTS DINÂMICOS -->
     <script>
-        // ESTADO GLOBAL DO ORÇAMENTO (ITENS INICIAIS)
-        let itensOrcamento = [
-            { descricao: 'Mão de Obra (Desoxidação)', valor: 180 },
-            { descricao: 'Tela Frontal OLED', valor: 450 }
-        ];
+      // ESTADO GLOBAL DO ORÇAMENTO (ITENS INICIAIS)
+      let itensOrcamento = [
+        { descricao: "Mão de Obra (Desoxidação)", valor: 180 },
+        { descricao: "Tela Frontal OLED", valor: 450 },
+      ];
 
-        // Função para recalcular o total e atualizar as tabelas do Orçamento e da Nota Fiscal
-        function renderizarOrcamentoENotaFiscal() {
-            const tabelaOrcamento = document.getElementById('tabela-orcamento-corpo');
-            const tabelaNF = document.getElementById('nf-itens-corpo');
-            
-            tabelaOrcamento.innerHTML = '';
-            tabelaNF.innerHTML = '';
-            
-            let total = 0;
+      // ---> NOVA FUNÇÃO DE REDIRECIONAMENTO WHATSAPP <---
+      function iniciarWhatsApp() {
+        const nome = document.getElementById("wpp-nome").value || "Cliente";
+        let telefone = document
+          .getElementById("wpp-tel")
+          .value.replace(/\D/g, ""); // Limpa caracteres não numéricos
 
-            itensOrcamento.forEach(item => {
-                total += item.valor;
-                
-                // Preenche linha no orçamento
-                tabelaOrcamento.innerHTML += `
+        if (!telefone) {
+          alert("Por favor, informe um número de telefone válido.");
+          return;
+        }
+
+        // Adiciona o DDI do Brasil (55) se não for fornecido
+        if (telefone.length === 10 || telefone.length === 11) {
+          telefone = "55" + telefone;
+        }
+
+        const mensagem = encodeURIComponent(
+          `Olá ${nome}, aqui é da TechFix OS. Como podemos ajudar com seu aparelho?`,
+        );
+        window.open(`https://wa.me/${telefone}?text=${mensagem}`, "_blank");
+      }
+
+      // Função para recalcular o total e atualizar as tabelas do Orçamento e da Nota Fiscal
+      function renderizarOrcamentoENotaFiscal() {
+        const tabelaOrcamento = document.getElementById(
+          "tabela-orcamento-corpo",
+        );
+        const tabelaNF = document.getElementById("nf-itens-corpo");
+
+        tabelaOrcamento.innerHTML = "";
+        tabelaNF.innerHTML = "";
+
+        let total = 0;
+
+        itensOrcamento.forEach((item) => {
+          total += item.valor;
+
+          // Preenche linha no orçamento
+          tabelaOrcamento.innerHTML += `
                     <tr>
                         <td class="p-3">${item.descricao}</td>
-                        <td class="p-3 text-right">R$ ${item.valor.toFixed(2).replace('.', ',')}</td>
+                        <td class="p-3 text-right">R$ ${item.valor.toFixed(2).replace(".", ",")}</td>
                     </tr>
                 `;
 
-                // Preenche linha na Nota Fiscal
-                tabelaNF.innerHTML += `
+          // Preenche linha na Nota Fiscal
+          tabelaNF.innerHTML += `
                     <tr>
                         <td>1</td>
                         <td>${item.descricao}</td>
-                        <td class="text-right">R$ ${item.valor.toFixed(2).replace('.', ',')}</td>
+                        <td class="text-right">R$ ${item.valor.toFixed(2).replace(".", ",")}</td>
                     </tr>
                 `;
-            });
+        });
 
-            // Atualiza totais na tela
-            const valorFormatado = 'R$ ' + total.toFixed(2).replace('.', ',');
-            document.getElementById('total-orcamento-texto').innerText = valorFormatado;
-            document.getElementById('nf-total-valor').innerText = valorFormatado;
-        }
+        // Atualiza totais na tela
+        const valorFormatado = "R$ " + total.toFixed(2).replace(".", ",");
+        document.getElementById("total-orcamento-texto").innerText =
+          valorFormatado;
+        document.getElementById("nf-total-valor").innerText = valorFormatado;
+      }
 
-        // Adiciona novos itens (aumenta o valor)
-        function adicionarItemOrcamento(descricao, valor) {
-            itensOrcamento.push({ descricao, valor });
-            renderizarOrcamentoENotaFiscal();
-            alert(`"${descricao}" adicionado ao orçamento e atualizado na Nota Fiscal!`);
-        }
-
-        // Remove o último item (diminui o valor)
-        function removerUltimoItem() {
-            if (itensOrcamento.length > 1) {
-                const removido = itensOrcamento.pop();
-                renderizarOrcamentoENotaFiscal();
-                alert(`"${removido.descricao}" removido do orçamento!`);
-            } else {
-                alert("O orçamento precisa ter pelo menos um item!");
-            }
-        }
-
-        // Aplica desconto (diminui o valor)
-        function aplicarDesconto(porcentagem) {
-            itensOrcamento = itensOrcamento.map(item => ({
-                descricao: item.descricao,
-                valor: item.valor * (1 - porcentagem / 100)
-            }));
-            renderizarOrcamentoENotaFiscal();
-            alert(`Desconto de ${porcentagem}% aplicado em todos os itens!`);
-        }
-
-        // Atualização de dados do cliente na NF
-        function atualizarClienteNF(nome) {
-            if (nome.trim() !== '') document.getElementById('nf-nome-cliente').innerText = nome;
-        }
-
-        function atualizarCpfNF(cpf) {
-            if (cpf.trim() !== '') document.getElementById('nf-cpf-cliente').innerText = cpf;
-        }
-
-        // Função de troca de abas
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-amber-500', 'text-slate-900');
-                btn.classList.add('bg-slate-800');
-            });
-
-            document.getElementById(tabId).classList.add('active');
-            
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if(activeBtn) {
-                activeBtn.classList.remove('bg-slate-800');
-                activeBtn.classList.add('bg-amber-500', 'text-slate-900');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Função de seleção do tipo de reparo (Etapa 2/3)
-        function selectRepairType(type) {
-            const cardExpress = document.getElementById('card-express');
-            const cardLongo = document.getElementById('card-longo');
-            const secaoChecklist = document.getElementById('secao-checklist-completo');
-
-            if (type === 'express') {
-                document.getElementById('radio-express').checked = true;
-                cardExpress.classList.replace('border-gray-200', 'border-amber-500');
-                cardExpress.classList.add('bg-amber-50');
-                cardLongo.classList.replace('border-amber-500', 'border-gray-200');
-                cardLongo.classList.remove('bg-amber-50');
-                
-                secaoChecklist.style.opacity = '0.5';
-                secaoChecklist.style.pointerEvents = 'none';
-            } else {
-                document.getElementById('radio-longo').checked = true;
-                cardLongo.classList.replace('border-gray-200', 'border-amber-500');
-                cardLongo.classList.add('bg-amber-50');
-                cardExpress.classList.replace('border-amber-500', 'border-gray-200');
-                cardExpress.classList.remove('bg-amber-50');
-                
-                secaoChecklist.style.opacity = '1';
-                secaoChecklist.style.pointerEvents = 'auto';
-            }
-        }
-
-        // Função de geração do PDF da Nota Fiscal
-        function gerarImagemNF(event) {
-            const elemento = document.getElementById('nota-fiscal-img');
-            const btn = event.currentTarget;
-            const textoOriginal = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando Documento...';
-            
-            const opcoes = {
-                margin:       10,
-                filename:     'TechFix_NF_OS1042.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opcoes).from(elemento).save().then(() => {
-                btn.innerHTML = textoOriginal;
-                alert('Nota Fiscal atualizada e baixada com sucesso!');
-            });
-        }
-
-        // Inicializa a renderização na primeira carga
+      // Adiciona novos itens (aumenta o valor)
+      function adicionarItemOrcamento(descricao, valor) {
+        itensOrcamento.push({ descricao, valor });
         renderizarOrcamentoENotaFiscal();
+        alert(
+          `"${descricao}" adicionado ao orçamento e atualizado na Nota Fiscal!`,
+        );
+      }
+
+      // Remove o último item (diminui o valor)
+      function removerUltimoItem() {
+        if (itensOrcamento.length > 1) {
+          const removido = itensOrcamento.pop();
+          renderizarOrcamentoENotaFiscal();
+          alert(`"${removido.descricao}" removido do orçamento!`);
+        } else {
+          alert("O orçamento precisa ter pelo menos um item!");
+        }
+      }
+
+      // Aplica desconto (diminui o valor)
+      function aplicarDesconto(porcentagem) {
+        itensOrcamento = itensOrcamento.map((item) => ({
+          descricao: item.descricao,
+          valor: item.valor * (1 - porcentagem / 100),
+        }));
+        renderizarOrcamentoENotaFiscal();
+        alert(`Desconto de ${porcentagem}% aplicado em todos os itens!`);
+      }
+
+      // Atualização de dados do cliente na NF
+      function atualizarClienteNF(nome) {
+        if (nome.trim() !== "")
+          document.getElementById("nf-nome-cliente").innerText = nome;
+      }
+
+      function atualizarCpfNF(cpf) {
+        if (cpf.trim() !== "")
+          document.getElementById("nf-cpf-cliente").innerText = cpf;
+      }
+
+      // Função de troca de abas
+      function switchTab(tabId) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((tab) => tab.classList.remove("active"));
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove("bg-amber-500", "text-slate-900");
+          btn.classList.add("bg-slate-800");
+        });
+
+        document.getElementById(tabId).classList.add("active");
+
+        const activeBtn = document.getElementById("btn-" + tabId);
+        if (activeBtn) {
+          activeBtn.classList.remove("bg-slate-800");
+          activeBtn.classList.add("bg-amber-500", "text-slate-900");
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // Função de seleção do tipo de reparo (Etapa 2/3)
+      function selectRepairType(type) {
+        const cardExpress = document.getElementById("card-express");
+        const cardLongo = document.getElementById("card-longo");
+        const secaoChecklist = document.getElementById(
+          "secao-checklist-completo",
+        );
+
+        if (type === "express") {
+          document.getElementById("radio-express").checked = true;
+          cardExpress.classList.replace("border-gray-200", "border-amber-500");
+          cardExpress.classList.add("bg-amber-50");
+          cardLongo.classList.replace("border-amber-500", "border-gray-200");
+          cardLongo.classList.remove("bg-amber-50");
+
+          secaoChecklist.style.opacity = "0.5";
+          secaoChecklist.style.pointerEvents = "none";
+        } else {
+          document.getElementById("radio-longo").checked = true;
+          cardLongo.classList.replace("border-gray-200", "border-amber-500");
+          cardLongo.classList.add("bg-amber-50");
+          cardExpress.classList.replace("border-amber-500", "border-gray-200");
+          cardExpress.classList.remove("bg-amber-50");
+
+          secaoChecklist.style.opacity = "1";
+          secaoChecklist.style.pointerEvents = "auto";
+        }
+      }
+
+      // Função de geração do PDF da Nota Fiscal
+      function gerarImagemNF(event) {
+        const elemento = document.getElementById("nota-fiscal-img");
+        const btn = event.currentTarget;
+        const textoOriginal = btn.innerHTML;
+
+        btn.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin"></i> Gerando Documento...';
+
+        const opcoes = {
+          margin: 10,
+          filename: "TechFix_NF_OS1042.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "mm", format: "a5", orientation: "portrait" },
+        };
+
+        html2pdf()
+          .set(opcoes)
+          .from(elemento)
+          .save()
+          .then(() => {
+            btn.innerHTML = textoOriginal;
+            alert("Nota Fiscal atualizada e baixada com sucesso!");
+          });
+      }
+
+      // Inicializa a renderização na primeira carga
+      renderizarOrcamentoENotaFiscal();
     </script>
-</body>
+  </body>
 </html>
